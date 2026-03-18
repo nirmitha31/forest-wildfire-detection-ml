@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .video-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .video-container h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        #video-stream {
+            width: 100%;
+            border-radius: 10px;
+            border: 3px solid #ddd;
+            background: #000;
+        }
+        
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .status-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .status-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-fire {
+            background: #f8d7da;
+            color: #721c24;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+        
+        .dot-normal {
+            background: #28a745;
+        }
+        
+        .dot-fire {
+            background: #dc3545;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .sensor-item {
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .sensor-active {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .sensor-inactive {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .sensor-icon {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .icon-active {
+            background: #dc3545;
+        }
+        
+        .icon-inactive {
+            background: #28a745;
+        }
+        
+        .location-display {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .location-display h4 {
+            color: #004085;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        .location-display p {
+            color: #004085;
+            margin: 5px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .alert-box p {
+            color: #856404;
+            margin: 5px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .detection-methods {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .detection-methods p {
+            color: #004085;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        
+        .detection-methods ul {
+            margin: 10px 0 0 20px;
+            color: #004085;
+        }
+        
+        .detection-methods li {
+            margin: 5px 0;
+            font-size: 0.85em;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .sensor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Advanced Fire Detection System</h1>
+            <p>Computer Vision + IoT Sensors + Live Location Tracking</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="video-container">
+                <h2>📹 Live Camera Feed</h2>
+                <img id="video-stream" src="{{ url_for('video_feed') }}" alt="Video Stream">
+            </div>
+            
+            <div class="status-panel">
+                <div class="status-card">
+                    <h3>🚨 Detection Status</h3>
+                    <div id="status-indicator" class="status-indicator status-normal">
+                        <span class="status-dot dot-normal"></span>
+                        <span>Monitoring - No Fire</span>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>🔌 Hardware Sensors</h3>
+                    <div class="sensor-grid">
+                        <div id="fire-sensor" class="sensor-item sensor-inactive">
+                            <span class="sensor-icon icon-inactive"></span>
+                            <span>Fire Sensor: NOT DETECTED</span>
+                        </div>
+                        <div id="smoke-sensor" class="sensor-item sensor-inactive">
+                            <span class="sensor-icon icon-inactive"></span>
+                            <span>Smoke: NOT DETECTED</span>
+                        </div>
+                        <div id="temp-sensor" class="sensor-item sensor-inactive">
+                            <span class="sensor-icon icon-inactive"></span>
+                            <span>Temp: NOT DETECTED</span>
+                        </div>
+                        <div id="all-sensors" class="sensor-item sensor-inactive">
+                            <span class="sensor-icon icon-inactive"></span>
+                            <span>All Sensors Status</span>
+                        </div>
+                    </div>
+                    <div id="sensor-update" style="margin-top: 10px; font-size: 0.8em; color: #666; text-align: center;">
+                        Last update: Never
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>📍 Current Location</h3>
+                    <div class="location-display">
+                        <h4>📌 Address</h4>
+                        <p id="location-address">Fetching location...</p>
+                        <p style="font-size: 0.75em; margin-top: 8px; color: #666;">
+                            <strong>Coordinates:</strong> <span id="location-coords">N/A</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>📊 Statistics</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Detections:</span>
+                            <span class="stat-value" id="detection-count">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Last Detection:</span>
+                            <span class="stat-value" id="last-detection">None</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">System Status:</span>
+                            <span class="stat-value" style="color: #28a745;">Active</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <h3>🔍 Detection Methods</h3>
+                    <div class="detection-methods">
+                        <p><strong>Active Algorithms:</strong></p>
+                        <ul>
+                            <li>HSV + YCrCb Color Analysis</li>
+                            <li>Motion Detection (Flicker)</li>
+                            <li>Shape Analysis</li>
+                            <li>Temporal Consistency</li>
+                            <li>IoT Sensor Integration</li>
+                            <li>GPS Location Tracking</li>
+                        </ul>
+                    </div>
+                    <div class="alert-box">
+                        <p><strong>⚠️ Alert Trigger Conditions:</strong></p>
+                        <p><strong>Telegram alert sent ONLY when ALL conditions are met:</strong></p>
+                        <p>1️⃣ Computer Vision detects fire in video</p>
+                        <p>2️⃣ Fire Sensor = 1 (DETECTED)</p>
+                        <p>3️⃣ Smoke Detector = 1 (DETECTED)</p>
+                        <p>4️⃣ Temperature Sensor = 1 (DETECTED)</p>
+                        <p>5️⃣ Location is available</p>
+                        <p style="margin-top: 10px; font-weight: bold; color: #d9534f;">
+                        🔥 Both Hardware AND Software must verify fire!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get location from browser (GPS)
+        function getLocationFromBrowser() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+                        
+                        // Send to server
+                        fetch('/update_location', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                latitude: latitude,
+                                longitude: longitude,
+                                accuracy: accuracy
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Location updated:', data);
+                        });
+                    },
+                    function(error) {
+                        console.log('Geolocation error:', error.message);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        }
+        
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update main detection status
+                    const indicator = document.getElementById('status-indicator');
+                    if (data.fire_detected) {
+                        indicator.className = 'status-indicator status-fire';
+                        indicator.innerHTML = '<span class="status-dot dot-fire"></span><span>FIRE DETECTED!</span>';
+                    } else {
+                        indicator.className = 'status-indicator status-normal';
+                        indicator.innerHTML = '<span class="status-dot dot-normal"></span><span>Monitoring - No Fire</span>';
+                    }
+                    
+                    // Update location display
+                    const location = data.location;
+                    if (location.address) {
+                        document.getElementById('location-address').textContent = location.address;
+                    } else {
+                        document.getElementById('location-address').textContent = 'Fetching location...';
+                    }
+                    
+                    if (location.latitude && location.longitude) {
+                        document.getElementById('location-coords').textContent = 
+                            `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
+                    } else {
+                        document.getElementById('location-coords').textContent = 'N/A';
+                    }
+                    
+                    // Update hardware sensors
+                    updateSensor('fire-sensor', data.sensor_status.fire_sensor);
+                    updateSensor('smoke-sensor', data.sensor_status.smoke_detector);
+                    updateSensor('temp-sensor', data.sensor_status.temperature_sensor);
+                    updateSensor('all-sensors', data.sensor_status.all_sensors_active);
+                    
+                    // Update sensor last update time
+                    if (data.sensor_status.last_update) {
+                        const updateTime = new Date(data.sensor_status.last_update);
+                        document.getElementById('sensor-update').textContent = 
+                            'Last update: ' + updateTime.toLocaleTimeString();
+                    }
+                    
+                    // Update statistics
+                    document.getElementById('detection-count').textContent = data.detection_count;
+                    document.getElementById('last-detection').textContent = data.last_detection;
+                });
+        }
+        
+        function updateSensor(elementId, isActive) {
+            const element = document.getElementById(elementId);
+            const textElement = element.querySelector('span:last-child');
+            
+            if (isActive) {
+                // RED for DETECTED (1/True)
+                element.className = 'sensor-item sensor-active';
+                element.querySelector('.sensor-icon').className = 'sensor-icon icon-active';
+                
+                if (elementId === 'fire-sensor') {
+                    textElement.textContent = 'Fire Sensor: DETECTED';
+                } else if (elementId === 'smoke-sensor') {
+                    textElement.textContent = 'Smoke: DETECTED';
+                } else if (elementId === 'temp-sensor') {
+                    textElement.textContent = 'Temp: DETECTED';
+                } else if (elementId === 'all-sensors') {
+                    textElement.textContent = '🚨 ALL SENSORS DETECTED!';
+                }
+            } else {
+                // GREEN for NOT DETECTED (0/False)
+                element.className = 'sensor-item sensor-inactive';
+                element.querySelector('.sensor-icon').className = 'sensor-icon icon-inactive';
+                
+                if (elementId === 'fire-sensor') {
+                    textElement.textContent = 'Fire Sensor: NOT DETECTED';
+                } else if (elementId === 'smoke-sensor') {
+                    textElement.textContent = 'Smoke: NOT DETECTED';
+                } else if (elementId === 'temp-sensor') {
+                    textElement.textContent = 'Temp: NOT DETECTED';
+                } else if (elementId === 'all-sensors') {
+                    textElement.textContent = 'All Sensors Status';
+                }
+            }
+        }
+        
+        // Get location on page load
+        getLocationFromBrowser();
+        
+        // Update location every 30 seconds
+        setInterval(getLocationFromBrowser, 30000);
+        
+        // Update status every second
+        setInterval(updateStatus, 1000);
+        updateStatus();
+    </script>
+</body>
+</html>
