@@ -13,8 +13,8 @@ app = Flask(__name__)
 
 # ==================== CONFIGURATION ====================
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN = '8235297059:AAGb2s9dWjhpEkPWvyuwLGOpZf9zWLhHzhA'  # Replace with your bot token
-TELEGRAM_CHAT_ID = ['6165371248', '7171984869', '1282406320', '6622051844']     # Replace with your chat ID
+TELEGRAM_BOT_TOKEN = ''  # Replace with your bot token
+TELEGRAM_CHAT_ID = [']     # Replace with your chat ID
 
 # Google Sheets Configuration (Public sharing link)
 # Format: https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/export?format=csv&gid=0
